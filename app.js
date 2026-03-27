@@ -404,7 +404,7 @@ function renderMainView(filtered, yearField, topN) {
   setAxes(years, stacked);
 
   gTitle.text(
-    `Main palette river by ${yearField === "Reg_year" ? "Registration Year" : "Advertisement Year"}`
+    `Main palette using ${yearField === "Reg_year" ? "Registration Year" : "Advertisement Year"}`
   );
 
   const area = areaGenerator();
@@ -427,7 +427,7 @@ function renderMainView(filtered, yearField, topN) {
       exit => exit.remove()
     );
 
-  // Rebind handlers every update so tooltip uses the current filtered rows.
+  // Rebind handlers every update so tooltip uses the current filtered rows
   applyLayerInteractions(gAreas.selectAll("path.stream-layer"), rows, "main", {});
 
   renderLegend(keys, d => colorPalette[d] || colorPalette.Other);

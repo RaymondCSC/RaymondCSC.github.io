@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Car Market Color Palette River</title>
+  <title>Car Market Color Palette</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
     :root {
@@ -221,7 +221,7 @@
 </head>
 <body>
   <div class="page">
-    <h1>How has the car market’s color palette changed over time?</h1>
+    <h1>How has people's preference on car colors changed over time?</h1>
     <div class="subtitle">
       Main view: a stacked streamgraph of car-color share over time. Click a color ribbon to drill down
       into that specific color by maker or body type using the same flowing ribbon design.
@@ -249,10 +249,10 @@
       <div class="control">
         <label for="topNSelect">Main View Color Detail</label>
         <select id="topNSelect">
+          <option value="999" selected>All categories</option>
           <option value="8">Top 8 + Other</option>
-          <option value="10" selected>Top 10 + Other</option>
+          <option value="10" >Top 10 + Other</option>
           <option value="12">Top 12 + Other</option>
-          <option value="999">All categories</option>
         </select>
       </div>
 
@@ -282,9 +282,8 @@
       <div class="legend" id="legend"></div>
       <div class="hint" id="hintText">Tip: click a color ribbon to drill down.</div>
       <div class="footnote">
-        The y-axis shows percentage thickness relative to the centerline of the streamgraph. In the drilldown,
-        all ribbons use shades of the selected color so the color identity stays consistent while the subgroups
-        are still distinguishable.
+        The y-axis shows percentage thickness relative to the share of the total by the filter selected. In the drilldown,
+        all ribbons use shades of the selected color.
       </div>
     </div>
   </div>
