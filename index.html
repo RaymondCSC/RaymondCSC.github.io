@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Car Market Color Palette River</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    :root {
+      --bg: #f7f7f7;
+      --panel: #ffffff;
+      --text: #1f1f1f;
+      --muted: #666;
+      --border: #ddd;
+      --accent: #1f5aa6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px 20px 40px 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(150px, 1fr));
+      gap: 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 18px;
+      align-items: end;
+    }
+
+    .control {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .control select,
+    .control button {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: white;
+      font-size: 14px;
+    }
+
+    .control button {
+      cursor: pointer;
+      background: #fff;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .control button:hover {
+      border-color: #bbb;
+    }
+
+    .control button:disabled {
+      cursor: default;
+      opacity: 0.45;
+    }
+
+    .meta {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .chart-wrap {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 12px 6px 12px;
+    }
+
+    .view-badge {
+      display: inline-block;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+      background: var(--accent);
+      padding: 8px 12px;
+      border-radius: 999px;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .axis path,
+    .axis line {
+      stroke: #bbb;
+    }
+
+    .axis text {
+      fill: #555;
+      font-size: 12px;
+    }
+
+    .grid line {
+      stroke: #e8e8e8;
+    }
+
+    .grid path {
+      display: none;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px 12px;
+      margin-top: 14px;
+      padding: 10px 4px 2px 4px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .legend-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.15);
+      flex: 0 0 16px;
+    }
+
+    .footnote {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: rgba(20, 20, 20, 0.95);
+      color: white;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.5;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      opacity: 0;
+      transition: opacity 0.12s ease;
+      max-width: 260px;
+      z-index: 10;
+    }
+
+    .no-data {
+      text-anchor: middle;
+      fill: #888;
+      font-size: 16px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    @media (max-width: 1100px) {
+      .controls {
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>How has the car market’s color palette changed over time?</h1>
+    <div class="subtitle">
+      Main view: a stacked streamgraph of car-color share over time. Click a color ribbon to drill down
+      into that specific color by maker or body type using the same flowing ribbon design.
+    </div>
+
+    <div class="controls">
+      <div class="control">
+        <label for="makerSelect">Maker</label>
+        <select id="makerSelect"></select>
+      </div>
+
+      <div class="control">
+        <label for="bodytypeSelect">Body Type</label>
+        <select id="bodytypeSelect"></select>
+      </div>
+
+      <div class="control">
+        <label for="yearFieldSelect">Time Field</label>
+        <select id="yearFieldSelect">
+          <option value="Reg_year" selected>Registration Year</option>
+          <option value="Adv_year">Advertisement Year</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <label for="topNSelect">Main View Color Detail</label>
+        <select id="topNSelect">
+          <option value="8">Top 8 + Other</option>
+          <option value="10" selected>Top 10 + Other</option>
+          <option value="12">Top 12 + Other</option>
+          <option value="999">All categories</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <label for="drilldownModeSelect">Drilldown Breakdown</label>
+        <select id="drilldownModeSelect">
+          <option value="Maker" selected>Maker</option>
+          <option value="Bodytype">Body Type</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <label>&nbsp;</label>
+        <button id="backButton" disabled>Back to Main Palette</button>
+      </div>
+    </div>
+
+    <div class="meta">
+      <div id="recordCount">Loading data...</div>
+      <div id="yearRange"></div>
+      <div id="filterSummary"></div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="view-badge" id="viewBadge">Main palette view</div>
+      <svg id="chart" viewBox="0 0 1280 680" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="legend" id="legend"></div>
+      <div class="hint" id="hintText">Tip: click a color ribbon to drill down.</div>
+      <div class="footnote">
+        The y-axis shows percentage thickness relative to the centerline of the streamgraph. In the drilldown,
+        all ribbons use shades of the selected color so the color identity stays consistent while the subgroups
+        are still distinguishable.
+      </div>
+    </div>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
